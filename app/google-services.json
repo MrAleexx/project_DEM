@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "916162965352",
+    "project_id": "fir-centroeco",
+    "storage_bucket": "fir-centroeco.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:916162965352:android:82a679c2c0f13d5886f0dd",
+        "android_client_info": {
+          "package_name": "com.example.drawer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "916162965352-nhgtm9f2ctk5i8bu2udqsu8c8opdqibk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.drawer",
+            "certificate_hash": "ec1ed6086c975c5e6c83e449bfd3b192ae3b1ca1"
+          }
+        },
+        {
+          "client_id": "916162965352-n4p7ic9n8l8bkkkq6lhndqfpu5kqmmc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzWubcXLS8gE-X966UbfmEoFPl5sleQ-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "916162965352-n4p7ic9n8l8bkkkq6lhndqfpu5kqmmc5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
