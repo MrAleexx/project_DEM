@@ -21,13 +21,20 @@ import com.example.drawer.ui.screens.ScreenDrawer.ScreenCitas.ViewAgendar.Seleci
 import com.example.drawer.ui.screens.ScreenDrawer.ScreenCitas.ViewAgendar.Splashcheck
 import com.example.drawer.ui.screens.ScreenDrawer.Servicios
 import com.example.drawer.data.utils.AuthManager
+import com.example.drawer.data.utils.CloudStorageManager
 import com.example.drawer.data.utils.FirestoreManager
+import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.RegistrarServicios
+import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.ViewServicio
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(navController: NavHostController, auth: AuthManager, context: Context, navigation: NavController) {
     val scope = rememberCoroutineScope()
+    val storage = CloudStorageManager()
+    val viewModelR = ReservaViewModel(storage)
+    val firestore = FirestoreManager(context)
+
     NavHost(navController, startDestination = AppScreen.Reserva.route) {
         composable(AppScreen.Home.route) {
             HomeScreen()
@@ -44,8 +51,16 @@ fun Navigation(navController: NavHostController, auth: AuthManager, context: Con
         composable(AppScreen.Preguntas.route) {
             Preguntas()
         }
-        val viewModelR = ReservaViewModel()
-        val firestore = FirestoreManager(context)
+
+        //Screen Administrator
+        composable(AppScreen.Registrar.route) {
+            RegistrarServicios(viewModelR, firestore,navController)
+        }
+
+        composable(AppScreen.ViewServicios.route){
+            ViewServicio(navController, firestore)
+        }
+
 
         //Navegacion de Reservar Cita
         composable(AppScreen.AgendarCita.route) {

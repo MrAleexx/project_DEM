@@ -114,8 +114,7 @@ fun Emcabezado(text: String) {
         )
         Spacer(modifier = Modifier.width(35.dp))
         Text(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier,
             text = text,
             fontWeight = FontWeight.Bold,
             fontSize = 25.sp,

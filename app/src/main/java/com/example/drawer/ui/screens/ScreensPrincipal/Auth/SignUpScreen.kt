@@ -49,11 +49,13 @@ import com.example.drawer.R
 import com.example.drawer.ui.screens.ScreenDrawer.Espacio
 import com.example.drawer.data.utils.AuthManager
 import com.example.drawer.data.utils.AuthRes
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(auth: AuthManager, NavController: NavController) {
     val context = LocalContext.current
+    var name by remember { mutableStateOf("")  }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val passVisible = remember { mutableStateOf(false) }
@@ -94,11 +96,12 @@ fun SignUpScreen(auth: AuthManager, NavController: NavController) {
                     style = TextStyle(fontSize = 30.sp)
                 )
                 Spacer(modifier = Modifier.height(30.dp))
-                /*OutlinedTextField(
-                    label = { Text(text = "Nombre") },
+                OutlinedTextField(
+                    label = { Text(text = "Nombre completo") },
                     value = name,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    onValueChange = { name = it })*/
+                    onValueChange = { name = it })
+
                 Spacer(modifier = Modifier.height(20.dp))
                 OutlinedTextField(
                     label = { Text(text = "Correo electrónico") },
@@ -126,7 +129,7 @@ fun SignUpScreen(auth: AuthManager, NavController: NavController) {
                     Button(
                         onClick = {
                             scope.launch {
-                                signUp(email, password, auth, context, NavController)
+                                signUp(name, email, password, auth, context, NavController)
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -161,19 +164,26 @@ fun SignUpScreen(auth: AuthManager, NavController: NavController) {
     }
 }
 
-
 private suspend fun signUp(
+    name: String,
     email: String,
     password: String,
     auth: AuthManager,
     context: Context,
     navigation: NavController
 ) {
-    if (email.isNotEmpty() && password.isNotEmpty()) {
+    if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
         when (val result = auth.createUserWithEmailAndPassword(email, password)) {
             is AuthRes.Success -> {
-                Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
-                navigation.popBackStack()
+                val profileUpdates = userProfileChangeRequest {
+                    displayName = name
+                }
+                result.data?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                        navigation.popBackStack()
+                    }
+                }
             }
 
             is AuthRes.Error -> {

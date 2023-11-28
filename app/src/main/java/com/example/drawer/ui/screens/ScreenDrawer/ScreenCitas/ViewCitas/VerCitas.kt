@@ -39,8 +39,7 @@ fun VerCita(firestore: FirestoreManager) {
 
     val citas by firestore.getCitasFlow().collectAsState(initial = emptyList())
 
-
-    if (!citas.isNullOrEmpty()) {
+    if (citas.isNotEmpty()) {
         LazyColumn(
             Modifier
                 .padding(10.dp)

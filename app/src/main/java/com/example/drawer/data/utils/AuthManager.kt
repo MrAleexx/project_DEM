@@ -32,6 +32,7 @@ class AuthManager(private val context: Context) {
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser?> {
         return try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            authResult.user?.saveToFirestore()
             AuthRes.Success(authResult.user)
         } catch(e: Exception) {
             AuthRes.Error(e.message ?: "Error al crear el usuario")
@@ -41,6 +42,7 @@ class AuthManager(private val context: Context) {
     suspend fun signInWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser?> {
         return try {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
+            authResult.user?.saveToFirestore()
             AuthRes.Success(authResult.user)
         } catch(e: Exception) {
             AuthRes.Error(e.message ?: "Error al iniciar sesión")
@@ -78,7 +80,7 @@ class AuthManager(private val context: Context) {
             val account = task.getResult(ApiException::class.java)
             AuthRes.Success(account)
         } catch (e: ApiException) {
-            AuthRes.Error(e.message ?: "Google sign-in failed.")
+            AuthRes.Error(e.message ?: "Error al iniciar sesión en Google.")
         }
     }
 
@@ -86,10 +88,11 @@ class AuthManager(private val context: Context) {
         return try {
             val firebaseUser = auth.signInWithCredential(credential).await()
             firebaseUser.user?.let {
+                it.saveToFirestore()
                 AuthRes.Success(it)
-            } ?: throw Exception("Sign in with Google failed.")
+            } ?: throw Exception("Error al iniciar sesión con Google")
         } catch (e: Exception) {
-            AuthRes.Error(e.message ?: "Sign in with Google failed.")
+            AuthRes.Error(e.message ?: "Error al iniciar sesión con Google")
         }
     }
 

@@ -1,4 +1,5 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
+@file:OptIn(ExperimentalMaterialApi::class)
 
 package com.example.drawer.ui.screens.ScreensPrincipal.Auth
 
@@ -250,7 +251,6 @@ private suspend fun emailPassSignIn(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color) {
     var click by remember { mutableStateOf(false) }

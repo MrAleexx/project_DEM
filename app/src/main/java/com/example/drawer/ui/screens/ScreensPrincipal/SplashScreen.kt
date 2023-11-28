@@ -33,7 +33,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(authManager: AuthManager, navController: NavHostController) {
     Scaffold {
-        it
         Column {
             Spacer(modifier = Modifier.height(8.dp))
             Box(modifier = Modifier.padding(it)) {

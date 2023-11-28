@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.drawer.R
-import com.example.drawer.ui.navigation.AppScreens
 import com.example.drawer.ui.screens.ScreenDrawer.Espacio
 import com.example.drawer.data.utils.AuthManager
 import com.example.drawer.data.utils.AuthRes
@@ -102,11 +101,7 @@ fun ForgotPasswordScreen(auth: AuthManager, navigation: NavController) {
                                             "Correo enviado",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        navigation.navigate(AppScreens.LoginScreen.route) {
-                                            popUpTo(AppScreens.ForgotPassword.route) {
-                                                inclusive = true
-                                            }
-                                        }
+                                        navigation.popBackStack()
                                     }
 
                                     is AuthRes.Error -> {

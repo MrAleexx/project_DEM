@@ -9,6 +9,9 @@ sealed class AppScreen(var route: String, var icon: Int, var title: String) {
     object Servicios : AppScreen("Servicios", R.drawable.feto, "Servicios")
     object Reserva : AppScreen("Reserva", R.drawable.reserva2, "Reserva tu cita")
     object Preguntas : AppScreen("Preguntas", R.drawable.pregunta, "Preguntas frecuentes")
+    object Registrar : AppScreen("Registrar", R.drawable.add_circle_outline, "Registrar Servico"    )
+    object ViewServicios : AppScreen("ViewServicios", R.drawable.edit, "Editar Servicios")
+
 
     //Ruta de Reservar Cita
     object AgendarCita: AppScreen("Agendar", 1, "Agendar")

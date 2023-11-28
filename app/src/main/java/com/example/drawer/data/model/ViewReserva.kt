@@ -1,14 +1,43 @@
 package com.example.drawer.data.model
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-
-
 import android.util.Log
+import androidx.lifecycle.LiveData
+import com.example.drawer.data.utils.CloudStorageManager
+import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.createImageFile
+import kotlinx.coroutines.tasks.await
 
-class ReservaViewModel : ViewModel() {
+class ReservaViewModel(internal val storage: CloudStorageManager) : ViewModel() {
+
+    private val _selectedImage = MutableLiveData<Uri?>()
+    val selectedImage: LiveData<Uri?> = _selectedImage
+
+    // Función para seleccionar una imagen
+    fun selectImage(uri: Uri) {
+        _selectedImage.value = uri
+    }
+
+    fun clearSelectedImage() {
+        _selectedImage.value = null
+    }
+
+    // Función para cargar una imagen a la nube
+    suspend fun uploadImage(context: Context): String {
+        var downloadUrl = ""
+        _selectedImage.value?.let { uri ->
+            val file = context.createImageFile()
+            storage.uploadAdminFile(file.name, uri)
+            downloadUrl = storage.getAdminStorageReference().child(file.name).downloadUrl.await().toString()
+        }
+        return downloadUrl
+    }
+
+
+
     val state = MutableLiveData(ReservaState())
-
     fun changeServico(servicio: String) {
         state.value = state.value?.copy(nombreServicio = servicio)
         Log.d("ReservaViewModel", "nombreServicio cambiado a $servicio")

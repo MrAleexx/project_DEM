@@ -30,6 +30,8 @@ import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +51,7 @@ import com.example.drawer.R
 import com.example.drawer.ui.navigation.navigationDrawer.AppScreen
 import com.example.drawer.ui.navigation.navigationDrawer.Navigation
 import com.example.drawer.data.utils.AuthManager
+import com.example.drawer.data.utils.getRoleFromFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -66,7 +69,12 @@ fun DrawerScreen(auth: AuthManager, navigation: NavController) {
         topBar = { TopBar(scope, scaffoldState) },
         drawerBackgroundColor = MaterialTheme.colors.onBackground,
         drawerContent = {
-            Drawer(scope = scope, scaffoldState = scaffoldState, navController = navController)
+            Drawer(
+                scope = scope,
+                scaffoldState = scaffoldState,
+                navController = navController,
+                auth
+            )
         },
         backgroundColor = MaterialTheme.colors.onPrimary,
         content = {
@@ -108,14 +116,31 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState) {
 }
 
 @Composable
-fun Drawer(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController) {
-    val items = listOf(
-        AppScreen.Home,
-        AppScreen.Perfil,
-        AppScreen.Servicios,
-        AppScreen.Reserva,
-        AppScreen.Preguntas
-    )
+fun Drawer(
+    scope: CoroutineScope,
+    scaffoldState: ScaffoldState,
+    navController: NavController,
+    auth: AuthManager
+) {
+    val userRole = remember { mutableStateOf("") }
+    // Obtén el rol del usuario
+    auth.getCurrentUser()?.getRoleFromFirestore { role ->
+        userRole.value = role
+    }
+
+    val items = if (userRole.value == "user") {
+        listOf(AppScreen.Perfil, AppScreen.Servicios)
+    } else {
+        // Si el rol del usuario es "admin", muestra todos los elementos
+        listOf(
+            AppScreen.Home,
+            AppScreen.Servicios,
+            AppScreen.Reserva,
+            AppScreen.Perfil,
+            AppScreen.Preguntas,
+            AppScreen.ViewServicios
+        )
+    }
 
     Box(
         modifier = Modifier
