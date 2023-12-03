@@ -1,5 +1,6 @@
 package com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,17 +33,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.drawer.R
+import com.example.drawer.data.model.ReservaViewModel
 import com.example.drawer.data.model.Servicios
+import com.example.drawer.data.utils.CloudStorageManager
 import com.example.drawer.data.utils.FirestoreManager
 import com.example.drawer.ui.navigation.navigationDrawer.AppScreen
 import com.example.drawer.ui.screens.ScreenDrawer.Espacio
 import com.example.drawer.ui.screens.ScreenDrawer.ScreenCitas.ViewAgendar.Emcabezado
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun ViewServicio(
+    viewModel: ReservaViewModel,
     navController: NavController,
     firestore: FirestoreManager,
+    storage: CloudStorageManager
 ) {
+    val scope = rememberCoroutineScope()
+
     val servicios = remember { mutableStateOf(listOf<Servicios>()) }
     LaunchedEffect(key1 = true) {
         firestore.getServiciosFlow().collect { serviciosList ->
@@ -114,8 +125,6 @@ fun ViewServicio(
             }
             items(servicios.value.size) { index ->
                 val servicio = servicios.value[index]
-                //val imageUrl = gallery[index]
-
                 Spacer(modifier = Modifier.height(15.dp))
                 Card(
                     modifier = Modifier
@@ -154,18 +163,46 @@ fun ViewServicio(
                                 .padding(bottom = 16.dp),
                             textAlign = TextAlign.Justify
                         )
-                        Button(
-                            onClick = {
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color(0xFF9F51CA),
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp)
-                        ) {
-                            Text(text = "Agendar Cita")
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Button(
+                                onClick = {
+                                    viewModel.selectedService = servicio
+                                    viewModel.originalImageUri = Uri.parse(servicio.imageUrl)
+                                    viewModel.selectImage(Uri.parse(servicio.imageUrl))
+                                    navController.navigate(AppScreen.Registrar.route)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFF9F51CA),
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = "Editar Servico"
+                                )
+                            }
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        firestore.deleteServicio(servicio.id ?: "")
+
+
+                                        // Luego, necesitas obtener una referencia a la imagen en el almacenamiento y eliminarla.
+                                        val imageRef = FirebaseStorage.getInstance()
+                                            .getReferenceFromUrl(servicio.imageUrl)
+
+                                        imageRef.delete().await()
+                                    }
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.delete),
+                                    contentDescription = "Eliminar servicio"
+                                )
+                            }
+
                         }
                     }
                 }

@@ -145,7 +145,7 @@ fun AgregarInfo(
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Emcabezado(text = "Informacion")
+                Emcabezado(text = "Informacion", modifier = Modifier.fillMaxWidth())
                 Espacio(dp = 15)
                 OutlinedTextField(
                     value = state?.nombre ?: "",

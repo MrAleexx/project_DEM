@@ -17,6 +17,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,23 +32,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.drawer.data.model.ReservaViewModel
 import com.example.drawer.R
+import com.example.drawer.data.model.Servicios
+import com.example.drawer.data.utils.FirestoreManager
 import com.example.drawer.ui.navigation.navigationDrawer.AppScreen
 import com.example.drawer.ui.screens.ScreenDrawer.Espacio
 
 @Composable
 fun SelecionarCita(
     navController: NavController,
-    viewModelR: ReservaViewModel
+    viewModelR: ReservaViewModel,
+    firestore: FirestoreManager
 ) {
-    val preciosServicios = mapOf(
-        "ECOGRAFÍA OBSTETRICA" to 100.0,
-        "ECOGRAFÍA TRANSVAGINAL" to 120.0,
-        "CONTROL PRENATAL" to 80.0,
-        "TEST DE EMBARAZO" to 50.0,
-        "PAPANICOLAU" to 70.0,
-        "RETIRO DE IMPLANTE" to 150.0,
-        "PLANIFICACIÓN FAMILIAR" to 200.0
-    )
+    val servicios = remember { mutableStateOf(listOf<Servicios>()) }
+    LaunchedEffect(key1 = true) {
+        firestore.getServiciosFlow().collect { serviciosList ->
+            servicios.value = serviciosList
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -59,12 +62,12 @@ fun SelecionarCita(
 
         Emcabezado(text = "Seleciona un servicio")
         Espacio(dp = 10)
-        preciosServicios.forEach { preciosServicios ->
+        servicios.value.forEach { servicios ->
             Espacio(dp = 7)
             Button(
                 onClick = {
-                    viewModelR.changeServico(preciosServicios.key)
-                    viewModelR.changePrecio(preciosServicios.value)
+                    viewModelR.changeServico(servicios.name)
+                    viewModelR.changePrecio(servicios.precio ?: 0.0)
                     navController.navigate(AppScreen.AgregarInfo.route)
                 },
                 modifier = Modifier
@@ -74,7 +77,7 @@ fun SelecionarCita(
                 colors = ButtonDefaults.textButtonColors(Color(0xF3FFD5FD))
             ) {
                 Text(
-                    text = preciosServicios.key,
+                    text = servicios.name,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(6f)
@@ -100,9 +103,9 @@ fun SelecionarCita(
 }
 
 @Composable
-fun Emcabezado(text: String) {
+fun Emcabezado(text: String, modifier:  Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

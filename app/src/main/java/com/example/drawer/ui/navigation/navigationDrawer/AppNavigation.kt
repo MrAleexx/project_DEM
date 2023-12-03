@@ -24,12 +24,20 @@ import com.example.drawer.data.utils.AuthManager
 import com.example.drawer.data.utils.CloudStorageManager
 import com.example.drawer.data.utils.FirestoreManager
 import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.RegistrarServicios
+import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.ViewConfirmacionReserva
+import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.ViewHistorialCitas
 import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.ViewServicio
+import com.example.drawer.ui.screens.ScreenDrawer.ScreenCitas.ViewCitas.CancelarCita
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Navigation(navController: NavHostController, auth: AuthManager, context: Context, navigation: NavController) {
+fun Navigation(
+    navController: NavHostController,
+    auth: AuthManager,
+    context: Context,
+    navigation: NavController
+) {
     val scope = rememberCoroutineScope()
     val storage = CloudStorageManager()
     val viewModelR = ReservaViewModel(storage)
@@ -43,7 +51,7 @@ fun Navigation(navController: NavHostController, auth: AuthManager, context: Con
             Perfil(auth, navigation)
         }
         composable(AppScreen.Servicios.route) {
-            Servicios(navController)
+            Servicios(navController, firestore)
         }
         composable(AppScreen.Reserva.route) {
             Reserva(navController, auth)
@@ -54,20 +62,26 @@ fun Navigation(navController: NavHostController, auth: AuthManager, context: Con
 
         //Screen Administrator
         composable(AppScreen.Registrar.route) {
-            RegistrarServicios(viewModelR, firestore,navController)
+            RegistrarServicios(viewModelR, firestore, navController)
         }
 
-        composable(AppScreen.ViewServicios.route){
-            ViewServicio(navController, firestore)
+        composable(AppScreen.ViewServicios.route) {
+            ViewServicio(viewModelR, navController, firestore, storage)
         }
 
+        composable(AppScreen.ViewHistorial.route) {
+            ViewHistorialCitas(firestore, navController, viewModelR)
+        }
+        composable(AppScreen.ViewConfirmar.route) {
+            ViewConfirmacionReserva(navController, viewModelR, firestore, scope)
+        }
 
         //Navegacion de Reservar Cita
         composable(AppScreen.AgendarCita.route) {
-            SelecionarCita( navController, viewModelR)
+            SelecionarCita(navController, viewModelR, firestore)
         }
         composable(AppScreen.AgregarInfo.route) {
-            AgregarInfo( navController, viewModelR)
+            AgregarInfo(navController, viewModelR)
         }
         composable(AppScreen.DetalleCita.route) {
             DetallesCita(navController, firestore, scope, viewModelR)
@@ -79,7 +93,10 @@ fun Navigation(navController: NavHostController, auth: AuthManager, context: Con
 
         //Navegacion de ver citas
         composable(AppScreen.VerCita.route) {
-            VerCita(firestore)
+            VerCita(navController, firestore, viewModelR)
+        }
+        composable(AppScreen.CancelarCita.route) {
+            CancelarCita(navController, viewModelR, firestore, scope)
         }
     }
 }

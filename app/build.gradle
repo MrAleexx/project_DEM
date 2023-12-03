@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace 'com.example.drawer'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.drawer"
@@ -70,6 +70,10 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
     implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'com.himanshoe:kalendar-endlos:1.3.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
+    implementation 'androidx.compose.material:material-icons-extended:1.5.4'
+
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

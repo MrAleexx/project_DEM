@@ -63,18 +63,12 @@ fun DrawerScreen(auth: AuthManager, navigation: NavController) {
     val navController = rememberNavController()
     val context = LocalContext.current
 
-
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = { TopBar(scope, scaffoldState) },
         drawerBackgroundColor = MaterialTheme.colors.onBackground,
         drawerContent = {
-            Drawer(
-                scope = scope,
-                scaffoldState = scaffoldState,
-                navController = navController,
-                auth
-            )
+            Drawer(scope,scaffoldState,navController,auth)
         },
         backgroundColor = MaterialTheme.colors.onPrimary,
         content = {
@@ -129,7 +123,13 @@ fun Drawer(
     }
 
     val items = if (userRole.value == "user") {
-        listOf(AppScreen.Perfil, AppScreen.Servicios)
+        listOf(
+            AppScreen.Home,
+            AppScreen.Servicios,
+            AppScreen.Reserva,
+            AppScreen.Perfil,
+            AppScreen.Preguntas,
+        )
     } else {
         // Si el rol del usuario es "admin", muestra todos los elementos
         listOf(
@@ -138,7 +138,8 @@ fun Drawer(
             AppScreen.Reserva,
             AppScreen.Perfil,
             AppScreen.Preguntas,
-            AppScreen.ViewServicios
+            AppScreen.ViewServicios,
+            AppScreen.ViewHistorial
         )
     }
 

@@ -5,12 +5,25 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import com.example.drawer.data.utils.CloudStorageManager
 import com.example.drawer.ui.screens.ScreenDrawer.ScreenAdmin.createImageFile
 import kotlinx.coroutines.tasks.await
 
-class ReservaViewModel(internal val storage: CloudStorageManager) : ViewModel() {
+class ReservaViewModel(private val storage: CloudStorageManager) : ViewModel() {
+
+    var selectedCita by mutableStateOf<Cita?>(null)
+
+    var isNewImageSelected by mutableStateOf(false)
+
+    //Almacena el servicio seleccionado - ViewServicios
+    var selectedService by mutableStateOf<Servicios?>(null)
+
+    //Almacena la imagen seleccionado - ViewServicios
+    var originalImageUri by mutableStateOf<Uri?>(null)
 
     private val _selectedImage = MutableLiveData<Uri?>()
     val selectedImage: LiveData<Uri?> = _selectedImage
@@ -36,8 +49,15 @@ class ReservaViewModel(internal val storage: CloudStorageManager) : ViewModel() 
     }
 
 
-
     val state = MutableLiveData(ReservaState())
+
+    fun changeEstadoCita(newEstado: EstadoCita) {
+        selectedCita?.let { cita ->
+            cita.estado = newEstado.name
+            // Aquí actualizas la cita en tu base de datos o donde sea que la estés almacenando
+            // Esto dependerá de cómo estés manejando tus datos
+        }
+    }
     fun changeServico(servicio: String) {
         state.value = state.value?.copy(nombreServicio = servicio)
         Log.d("ReservaViewModel", "nombreServicio cambiado a $servicio")

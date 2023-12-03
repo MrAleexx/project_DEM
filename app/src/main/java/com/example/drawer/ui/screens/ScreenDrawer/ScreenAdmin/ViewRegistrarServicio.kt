@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -59,6 +60,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 const val REQUEST_CODE = 0
+
 @Composable
 fun RegistrarServicios(
     viewModel: ReservaViewModel,
@@ -67,9 +69,11 @@ fun RegistrarServicios(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var servicio by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
+    var servicio by remember { mutableStateOf(viewModel.selectedService?.name ?: "") }
+    var description by remember { mutableStateOf(viewModel.selectedService?.descrip ?: "") }
+    var price by remember { mutableStateOf(viewModel.selectedService?.precio?.toString() ?: "") }
+
+
 
     // Mueve la declaración de 'gallery' fuera de la función Column
     val selectedImageUri by viewModel.selectedImage.observeAsState()
@@ -78,9 +82,9 @@ fun RegistrarServicios(
             uri?.let {
                 // En lugar de subir la imagen inmediatamente, la guardamos en el ViewModel
                 viewModel.selectImage(it)
+                viewModel.isNewImageSelected = true
             }
         }
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -131,7 +135,6 @@ fun RegistrarServicios(
                                     .fillMaxWidth()
                             )
                             Spacer(modifier = Modifier.height(10.dp))
-
                             OutlinedTextField(
                                 label = { Text(text = "Descripción") },
                                 value = description,
@@ -141,7 +144,6 @@ fun RegistrarServicios(
                                     .height(170.dp)
                             )
                             Spacer(modifier = Modifier.height(10.dp))
-
                             OutlinedTextField(
                                 label = { Text(text = "Precio") },
                                 value = price,
@@ -204,26 +206,45 @@ fun RegistrarServicios(
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(Modifier.height(10.dp))
                         }
                     }
                 }
                 Button(
                     onClick = {
                         scope.launch {
-                            val imageUrl = viewModel.uploadImage(context)
+                            val imageUrl: String?
+                            if (viewModel.isNewImageSelected) {
+                                // Solo carga la imagen si el usuario ha seleccionado una nueva imagen.
+                                Log.d("Guardar", "El usuario ha seleccionado una nueva imagen.")
+                                imageUrl = viewModel.selectedImage.value?.let { viewModel.uploadImage(context) }
+                            } else {
+                                // Si el usuario no ha seleccionado una nueva imagen, utiliza la URL de la imagen original.
+                                Log.d("Guardar", "El usuario no ha seleccionado una nueva imagen.")
+                                imageUrl = viewModel.selectedService?.imageUrl
+                            }
                             val newServicio = Servicios(
                                 name = servicio,
                                 descrip = description,
                                 precio = price.toDoubleOrNull()
                                     ?: 0.0,
-                                imageUrl = imageUrl
+                                imageUrl = imageUrl ?: ""
                             )
-                            firestore.addServicio(newServicio)
+                            if (viewModel.selectedService != null) {
+                                newServicio.id = viewModel.selectedService?.id
+                                firestore.updateServicio(newServicio)
+                                Log.d("Guardar", "Actualizando el servicio existente.")
+                            } else {
+                                firestore.addServicio(newServicio)
+                                Log.d("Guardar", "Agregando un nuevo servicio.")
+                            }
+                        }.invokeOnCompletion {
+                            viewModel.clearSelectedImage()
+                            viewModel.selectedService = null
+                            viewModel.originalImageUri = null
+                            viewModel.isNewImageSelected = false
+                            navController.popBackStack()
                         }
-                        viewModel.clearSelectedImage()
-
-                        navController.popBackStack()
                     },
                     modifier = Modifier
                         .width(300.dp)
@@ -238,6 +259,7 @@ fun RegistrarServicios(
         }
     }
 }
+
 @Composable
 fun CoilImage(
     imageUrl: String,

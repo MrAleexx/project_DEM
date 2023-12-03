@@ -7,12 +7,13 @@ data class Cita(
     val fecha: String = "",
     val hora: String = "",
     val precio: Double = 0.0,
-    var estado: String = EstadoCita.PROCESO.name,
+    var estado: String = EstadoCita.PENDIENTE.name,
     val nota: String? = "",
-    val motivoCancelacion: String? = ""
+    var motivoCancelacion: String? = ""
 )
 
 enum class EstadoCita {
+    PENDIENTE,
     PROCESO,
     CANCELADA,
     CONCLUIDA

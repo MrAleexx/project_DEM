@@ -306,7 +306,7 @@ fun DetallesCita(
                         precio = state?.precio ?: 0.0,
                         fecha = state?.fecha ?: "",
                         hora = state?.hora ?: "",
-                        nota = state?.hora ?: ""
+                        nota = state?.nota ?: ""
                     )
                     val newPaciente = Paciente(
                         nameAll = state?.nombre ?: "",

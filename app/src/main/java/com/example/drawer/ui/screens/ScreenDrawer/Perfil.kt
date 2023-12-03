@@ -42,7 +42,7 @@ import com.example.drawer.data.utils.AuthManager
 private var welcomeMessage by mutableStateOf("Bienvenido(a)")
 
 @Composable
-fun Perfil( auth: AuthManager, navigation: NavController) {
+fun Perfil(auth: AuthManager, navigation: NavController) {
     val user = auth.getCurrentUser()
     var showDialog by remember { mutableStateOf(false) }
     val onLogoutConfirmed: () -> Unit = {
@@ -53,6 +53,7 @@ fun Perfil( auth: AuthManager, navigation: NavController) {
             }
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +61,7 @@ fun Perfil( auth: AuthManager, navigation: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Espacio(dp = 20)
-        Emcabezado(text = "Perfil")
+        Emcabezado(text = "Perfil", modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
         if (user?.photoUrl != null) {

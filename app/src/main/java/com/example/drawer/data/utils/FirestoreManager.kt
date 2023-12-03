@@ -25,10 +25,32 @@ class FirestoreManager(context: Context) {
         firestore.collection("citas").add(cita).await()
     }
 
+    suspend fun updateCita(cita: Cita) {
+        cita.id?.let { id ->
+            firestore.collection("citas").document(id).set(cita).await()
+        }
+    }
 
     fun getCitasFlow(): Flow<List<Cita>> = callbackFlow {
         val citasRef = firestore.collection("citas")
             .whereEqualTo("userId", userId).orderBy("fecha")
+
+        val subscription = citasRef.addSnapshotListener { snapshot, _ ->
+            snapshot?.let { querySnapshot ->
+                val citas = mutableListOf<Cita>()
+                for (document in querySnapshot.documents) {
+                    val cita = document.toObject(Cita::class.java)
+                    cita?.id = document.id
+                    cita?.let { citas.add(it) }
+                }
+                trySend(citas).isSuccess
+            }
+        }
+        awaitClose { subscription.remove() }
+    }
+
+    fun getAllCitasFlow(): Flow<List<Cita>> = callbackFlow {
+        val citasRef = firestore.collection("citas").orderBy("fecha")
 
         val subscription = citasRef.addSnapshotListener { snapshot, _ ->
             snapshot?.let { querySnapshot ->
@@ -65,24 +87,6 @@ class FirestoreManager(context: Context) {
             }
     }
 
-
-    fun getPacientesFlow(): Flow<List<Paciente>> = callbackFlow {
-        val pacientesRef = firestore.collection("pacientes")
-            .whereEqualTo("userId", userId)
-
-        val subscription = pacientesRef.addSnapshotListener { snapshot, _ ->
-            snapshot?.let { querySnapshot ->
-                val pacientes = mutableListOf<Paciente>()
-                for (document in querySnapshot.documents) {
-                    val paciente = document.toObject(Paciente::class.java)
-                    paciente?.id = document.id
-                    paciente?.let { pacientes.add(it) }
-                }
-                trySend(pacientes).isSuccess
-            }
-        }
-        awaitClose { subscription.remove() }
-    }
 
     //funciones Collection Servicios
     suspend fun addServicio(servicio: Servicios) = coroutineScope {
