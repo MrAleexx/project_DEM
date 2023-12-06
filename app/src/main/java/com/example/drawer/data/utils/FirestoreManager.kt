@@ -68,23 +68,9 @@ class FirestoreManager(context: Context) {
 
 
     //funciones Collection Paciente
-    suspend fun addPaciente(paciente: Paciente) = coroutineScope {
+    suspend fun addPaciente(paciente: Paciente) {
         paciente.userId = userId.toString()
-        val docRef = firestore.collection("pacientes").document(paciente.userId)
-
-        docRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    Log.d("AddPaciente", "El paciente ya existe!")
-                } else {
-                    launch {
-                        firestore.collection("pacientes").add(paciente).await()
-                    }
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("AddPaciente", "Error al obtener el documento", exception)
-            }
+        firestore.collection("pacientes").add(paciente).await()
     }
 
 
