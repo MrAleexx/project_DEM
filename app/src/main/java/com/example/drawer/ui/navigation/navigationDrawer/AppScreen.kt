@@ -12,8 +12,8 @@ sealed class AppScreen(var route: String, var icon: Int, var title: String) {
 
     //Ruta Admin
     object Registrar : AppScreen("Registrar", R.drawable.add_circle_outline, "Registrar Servico"    )
-    object ViewServicios : AppScreen("ViewServicios", R.drawable.edit, "Editar Servicios")
-    object ViewHistorial : AppScreen("ViewHistorial",R.drawable.calendar, "Historial de citas")
+    object ViewServicios : AppScreen("ViewServicios", R.drawable.lapiz__1_, "Editar Servicios")
+    object ViewHistorial : AppScreen("ViewHistorial",R.drawable.dia_del_calendario, "Historial de citas")
     object ViewConfirmar : AppScreen("ViewConfirmacionReserva", R.drawable.check_line, "Confirmar cita")
 
 
